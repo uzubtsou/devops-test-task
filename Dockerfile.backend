@@ -1,0 +1,19 @@
+ARG NODE_VERSION="16.14.0"
+
+FROM node:${NODE_VERSION}-slim
+
+WORKDIR /usr/src/app
+
+COPY backend/package.json backend/yarn.lock ./
+RUN yarn install && \
+    yarn cache clean
+
+COPY backend/ .
+RUN yarn build
+
+EXPOSE 8080
+
+ENV NODE_ENV=development
+ENV PORT=8080
+
+CMD ["yarn", "server:dev"]

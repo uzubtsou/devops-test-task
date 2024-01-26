@@ -1,0 +1,19 @@
+ARG NODE_VERSION="16.14.0"
+
+FROM node:${NODE_VERSION}-slim
+
+WORKDIR /usr/src/app
+
+COPY frontend/package.json frontend/yarn.lock ./
+RUN yarn install && \
+    yarn cache clean
+
+ENV NODE_ENV=development
+ENV REACT_APP_API_URL=http://localhost:3000
+
+COPY frontend/ .
+RUN yarn build
+
+EXPOSE 3000
+
+CMD ["yarn", "dev"]
