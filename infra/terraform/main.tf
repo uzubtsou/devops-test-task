@@ -5,8 +5,8 @@ provider "minikube" {
 resource "minikube_cluster" "test_task" {
   cluster_name = "test-task"
 
-  driver            = "podman"
-  container_runtime = "cri-o"
+  driver            = "docker"
+  container_runtime = "containerd"
 
   addons = [
     "default-storageclass",
