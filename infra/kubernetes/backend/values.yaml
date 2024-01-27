@@ -29,10 +29,15 @@ job:
   # failedJobsHistoryLimit: 1
   # concurrencyPolicy: "Forbid"
   # startingDeadlineSeconds: 200
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
 
 podAnnotations: {}
 podLabels: {}

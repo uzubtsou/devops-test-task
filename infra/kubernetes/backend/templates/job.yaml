@@ -36,4 +36,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "backend.databaseConfig" . }}
                   key: database_url
+            resources:
+              {{- toYaml .Values.job.resources | nindent 14 }}
           restartPolicy: "{{ .Values.job.restartPolicy }}"
