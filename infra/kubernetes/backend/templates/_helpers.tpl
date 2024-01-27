@@ -46,16 +46,25 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Secret token name
 */}}
 {{- define "backend.secrets" -}}
-{{- if .Values.fullnameOverride }}
-{{- printf "%s-secret" (.Values.fullnameOverride | trunc 63 | trimSuffix "-") }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- printf "%s-secret" (.Release.Name | trunc 63 | trimSuffix "-") }}
-{{- else }}
-{{- printf "%s-%s-secret" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-secret" (include "backend.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
+
+{{/*
+Database parts
+*/}}
+{{- define "backend.databaseConfig" -}}
+{{- printf "%s-database-config" (include "backend.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
+
+{{- define "backend.databaseURL" -}}
+postgres://{{ .Values.database.username }}:{{ .Values.database.password }}@{{ .Values.database.host }}/{{ default "coffee_dev" .Values.database.name }}
+{{- end }}
+
+{{/*
+Job parts
+*/}}
+{{- define "backend.jobName" -}}
+{{- printf "%s-job" (include "backend.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
@@ -71,7 +80,7 @@ Create the name of the service account to use
 */}}
 {{- define "backend.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "backend.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "frontend.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "backend.jobName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.job.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit | default 1 }}
+  concurrencyPolicy: {{ .Values.concurrencyPolicy | default "Forbid" }}
+  startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds | default 200 }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}
+            image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command:
+              {{- toYaml .Values.job.command | nindent 14 }}
+            env:
+            - name: PORT
+              value: {{ .Values.service.port | quote }}
+            - name: NODE_ENV
+              value: "development"
+            - name: API_KEY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "backend.secrets" . }}
+                  key: token
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "backend.databaseConfig" . }}
+                  key: database_url
+          restartPolicy: "{{ .Values.job.restartPolicy }}"

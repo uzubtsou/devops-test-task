@@ -1,3 +1,4 @@
+---
 # Default values for backend.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -5,14 +6,29 @@
 replicaCount: 1
 
 image:
-  repository: registry.gitlab.com/uzubtsou/devops-test-task
-  name: backend
-  pullPolicy: IfNotPresent
+  repository: "uzubtsou"
+  name: "backend"
+  pullPolicy: "IfNotPresent"
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 # Security token
 token: "token"
+
+database:
+  username: "postgres" # replace with actual username
+  password: "postgres" # replace with actual password
+  host: "localhost:5432" # replace with actual host and port
+  name: "coffee_dev" # default value, can be overridden
+
+job:
+  schedule: "0 0 * * *"
+  command: ["yarn", "jobs:supply:dev"]
+  restartPolicy: "OnFailure"
+  # successfulJobsHistoryLimit: 3
+  # failedJobsHistoryLimit: 1
+  # concurrencyPolicy: "Forbid"
+  # startingDeadlineSeconds: 200
 
 imagePullSecrets: []
 nameOverride: ""
