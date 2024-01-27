@@ -1,5 +1,5 @@
 ---
-name: ci
+name: image-building
 
 on:
   push:
@@ -21,6 +21,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Get backend app version
+        id: package_version
+        run: echo "BACKEND_VERSION=$(cat backend/package.json | jq -r .version)" >> $GITHUB_ENV
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
@@ -28,7 +31,9 @@ jobs:
           file: ./Dockerfile.backend
           platforms: linux/arm64/v8,linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ env.BACKEND_VERSION }}
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -44,6 +49,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Get frontend app version
+        id: package_version
+        run: echo "FRONTEND_VERSION=$(cat frontend/package.json | jq -r .version)" >> $GITHUB_ENV
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
         with:
@@ -51,4 +59,6 @@ jobs:
           file: ./Dockerfile.frontend
           platforms: linux/arm64/v8,linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }}
