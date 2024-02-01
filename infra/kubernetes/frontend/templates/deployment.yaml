@@ -35,11 +35,13 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+              {{- toYaml .Values.frontend.command | nindent 14 }}
           env:
             - name: PORT
               value: {{ .Values.service.port | quote }}
             - name: NODE_ENV
-              value: "development"
+              value: {{ default "development" .Values.frontend.env }}
             - name: REACT_APP_API_URL
               value: {{ .Values.backend.url | quote }}
           ports:
@@ -48,7 +50,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api/health
+              path: /
               port: http
             initialDelaySeconds: 60
             timeoutSeconds: 3
@@ -57,7 +59,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /
               port: http
             initialDelaySeconds: 10
             timeoutSeconds: 3
