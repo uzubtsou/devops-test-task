@@ -57,7 +57,7 @@ Database parts
 {{- end }}
 
 {{- define "backend.databaseURL" -}}
-postgres://{{ .Values.database.username }}:{{ .Values.database.password }}@{{ .Values.database.host }}/{{ default "coffee_dev" .Values.database.name }}
+postgres://{{ .Values.database.username }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ default "5432" .Values.database.port }}/{{ default "coffee_dev" .Values.database.name }}
 {{- end }}
 
 {{/*

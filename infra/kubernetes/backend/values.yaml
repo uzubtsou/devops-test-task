@@ -16,10 +16,11 @@ image:
 token: "token"
 
 database:
+  name: "coffee_dev" # default value, can be overridden
   username: "postgres" # replace with actual username
   password: "postgres" # replace with actual password
-  host: "localhost:5432" # replace with actual host and port
-  name: "coffee_dev" # default value, can be overridden
+  host: "postgresql" # replace with actual host and port
+  # port: ""  # default port 5432
 
 job:
   schedule: "0 0 * * *"
