@@ -1,13 +1,19 @@
 variable "application_namespace" {
   description = "Namespace to deploy application"
   type        = string
-  default     = "develop"
+  default     = "prod"
 }
 
 variable "backend_port" {
   description = "Port for backend service"
   type        = string
-  default     = "8080"
+  default     = "8081"
+}
+
+variable "frontend_port" {
+  description = "Port for frontend service"
+  type        = string
+  default     = "3001"
 }
 
 variable "postgresql_version" {
@@ -38,7 +44,7 @@ variable "postgresql_chart_version" {
 variable "postgresql_database_name" {
   description = "Postgresql database name"
   type        = string
-  default     = "coffee_dev"
+  default     = "coffee_prod"
 }
 
 variable "api_key_token" {

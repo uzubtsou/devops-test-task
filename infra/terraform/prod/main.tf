@@ -1,29 +1,18 @@
-provider "minikube" {
-  kubernetes_version = "v1.27.2"
-}
+data "terraform_remote_state" "minikube" {
+  backend = "local"
 
-resource "minikube_cluster" "test_task" {
-  cluster_name = "test-task"
-
-  driver            = "docker"
-  container_runtime = "containerd"
-
-  addons = [
-    "default-storageclass",
-    "storage-provisioner",
-    "ingress",
-    "ingress-dns"
-  ]
+  config = {
+    path = "../base/terraform.tfstate"
+  }
 }
 
 provider "helm" {
-
   kubernetes {
-    host = minikube_cluster.test_task.host
+    host = data.terraform_remote_state.minikube.outputs.host
 
-    client_certificate     = minikube_cluster.test_task.client_certificate
-    client_key             = minikube_cluster.test_task.client_key
-    cluster_ca_certificate = minikube_cluster.test_task.cluster_ca_certificate
+    client_certificate     = data.terraform_remote_state.minikube.outputs.client_certificate
+    client_key             = data.terraform_remote_state.minikube.outputs.client_key
+    cluster_ca_certificate = data.terraform_remote_state.minikube.outputs.cluster_ca_certificate
   }
 }
 
@@ -52,27 +41,21 @@ resource "helm_release" "postgresql" {
     name  = "global.postgresql.auth.database"
     value = var.postgresql_database_name
   }
-
-  depends_on = [
-    minikube_cluster.test_task
-  ]
 }
 
 resource "helm_release" "backend" {
   name = "backend"
   # it's better to upload it somewhere actually
-  chart = "../kubernetes/backend/"
+  chart = "../../kubernetes/backend/"
 
   namespace        = var.application_namespace
   create_namespace = true
 
+  values = ["${file("backend.values.yaml")}"]
+
   set_sensitive {
     name  = "token"
     value = var.api_key_token
-  }
-  set {
-    name  = "service.port"
-    value = var.backend_port
   }
   set {
     name  = "database.username"
@@ -94,6 +77,10 @@ resource "helm_release" "backend" {
     name  = "service.type"
     value = "LoadBalancer"
   }
+  set {
+    name  = "service.port"
+    value = var.backend_port
+  }
 
   depends_on = [
     helm_release.postgresql
@@ -102,12 +89,13 @@ resource "helm_release" "backend" {
 
 resource "helm_release" "frontend" {
   name = "frontend"
-
   # it's better to upload it somewhere actually
-  chart = "../kubernetes/frontend/"
+  chart = "../../kubernetes/frontend/"
 
   namespace        = var.application_namespace
   create_namespace = true
+
+  values = ["${file("backend.values.yaml")}"]
 
   set {
     name  = "backend.url"
@@ -115,7 +103,7 @@ resource "helm_release" "frontend" {
   }
   set {
     name  = "frontend.env"
-    value = "development"
+    value = "production"
   }
   set_list {
     name  = "frontend.command"
@@ -124,5 +112,9 @@ resource "helm_release" "frontend" {
   set {
     name  = "service.type"
     value = "LoadBalancer"
+  }
+  set {
+    name  = "service.port"
+    value = var.frontend_port
   }
 }
