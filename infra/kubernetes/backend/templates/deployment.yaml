@@ -37,11 +37,13 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            {{- toYaml .Values.backend.command | nindent 12 }}
           env:
             - name: PORT
               value: {{ .Values.service.port | quote }}
             - name: NODE_ENV
-              value: "development"
+              value: {{ default "development" .Values.backend.env }}
             - name: API_KEY_TOKEN
               valueFrom:
                 secretKeyRef:

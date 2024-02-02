@@ -15,6 +15,12 @@ image:
 # Security token
 token: "token"
 
+# backend config
+backend:
+  # env: "development"
+  command: ["yarn", "server:dev"]
+
+# database
 database:
   name: "coffee_dev" # default value, can be overridden
   username: "postgres" # replace with actual username
@@ -46,13 +52,13 @@ podLabels: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
