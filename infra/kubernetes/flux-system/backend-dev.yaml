@@ -5,7 +5,7 @@ metadata:
   finalizers:
     - finalizers.fluxcd.io
   name: backend-dev
-  namespace: flux-system
+  namespace: develop
 spec:
   interval: 1m0s
   path: ./infra/kubernetes/develop
