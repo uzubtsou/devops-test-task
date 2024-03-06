@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: backend
+          env:
+            - name: PORT
+              value: "8080"
+            - name: NODE_ENV
+              value: development
+            - name: API_KEY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: token
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-config
+                  key: database_url
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi

@@ -1,0 +1,46 @@
+---
+# Source: backend/templates/job.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 200
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backend
+              image: uzubtsou/backend:0.0.1
+              imagePullPolicy: IfNotPresent
+              command:
+                - yarn
+                - jobs:supply:dev
+              env:
+                - name: PORT
+                  value: "8080"
+                - name: NODE_ENV
+                  value: "development"
+                - name: API_KEY_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: secrets
+                      key: token
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: database-config
+                      key: database_url
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+          restartPolicy: "OnFailure"
