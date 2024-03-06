@@ -4,15 +4,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deployment
+  labels:
+    app: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: deployment
+      app: backend
   template:
     metadata:
       labels:
-        name: deployment
+        app: backend
     spec:
       containers:
         - name: backend
