@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - ../apps/backend
+  - ../../apps/backend
 
 namespace: develop
 namePrefix: dev-
